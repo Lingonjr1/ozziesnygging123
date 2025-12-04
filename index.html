@@ -1,21 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ozzie karrövdishan</title>
-    <style>
-        html, body {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-        }
-        body {
-            background: url('https://i.ibb.co/ymTLMGvq/image.png') no-repeat center center fixed;
-            background-size: 100% 100%;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ozzie Clicker</title>
+<style>
+    html, body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        cursor: pointer;
+        user-select: none;
+        overflow: hidden;
+    }
+    body {
+        background: url('https://i.ibb.co/ymTLMGvq/image.png') no-repeat center center fixed;
+        background-size: 100% 100%;
+    }
+    #counter {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        font-size: 36px;
+        color: white;
+        text-shadow: 1px 1px 5px black;
+    }
+</style>
 </head>
 <body>
+<div id="counter">Clicks: 0</div>
+
+<script>
+let clicks = parseInt(localStorage.getItem('clicks')) || 0;
+document.getElementById('counter').textContent = 'Clicks: ' + clicks;
+    
+document.body.addEventListener('click', () => {
+    clicks++;
+    document.getElementById('counter').textContent = 'Clicks: ' + clicks;
+    localStorage.setItem('clicks', clicks);
+});
+</script>
 </body>
 </html>
