@@ -60,6 +60,9 @@ button {cursor:pointer;padding:5px 10px;font-size:16px}
 <ul id="achList"></ul>
 </div>
 
+
+  <button id="muteBtn">Mute Sounds</button>
+
 <script>
 let clicks = parseInt(localStorage.getItem('clicks'))||0
 let clickValue = parseInt(localStorage.getItem('clickValue'))||1
@@ -128,6 +131,25 @@ prestigeBonusEl.textContent=`+${prestigePoints*10}% click boost`
  checkAchievements()
 }
 
+function playSound(sound) {
+  if (!isMuted) {
+    sound.currentTime = 0 // rewind to start
+    sound.play()
+  }
+}
+
+
+let isMuted = false
+const muteBtn = document.getElementById('muteBtn')
+
+muteBtn.addEventListener('click', () => {
+  isMuted = !isMuted
+  clickSound.muted = isMuted
+  bonusSound.muted = isMuted
+  muteBtn.textContent = isMuted ? 'Unmute Sounds' : 'Mute Sounds'
+})
+
+
 function showClickImage(x,y){
  const img=document.createElement('img')
  const rand=Math.random()
@@ -141,7 +163,7 @@ function showClickImage(x,y){
 
 function gainClicks(amount){
  // Critical hit 10% chance
- if(Math.random()<0.1){amount*=2; bonusSound.play()}
+ if(Math.random()<0.1){amount*=2; playSound(bonusSound)}
  clicks+=amount
  combo++
  saveGame()
@@ -151,7 +173,7 @@ function gainClicks(amount){
 document.body.addEventListener('click',(e)=>{
  gainClicks(clickValue*(1+prestigePoints*0.1))
  showClickImage(e.clientX,e.clientY)
- clickSound.play()
+ playSound(clickSound)
 })
 
 clickUpgradeBtn.addEventListener('click',(e)=>{
