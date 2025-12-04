@@ -12,33 +12,116 @@
         cursor: pointer;
         user-select: none;
         overflow: hidden;
+        font-family: Arial, sans-serif;
     }
     body {
         background: url('https://i.ibb.co/ymTLMGvq/image.png') no-repeat center center fixed;
         background-size: 100% 100%;
+        color: white;
     }
     #counter {
         position: fixed;
         top: 20px;
         left: 20px;
         font-size: 36px;
-        color: white;
         text-shadow: 1px 1px 5px black;
+    }
+    #upgrades {
+        position: fixed;
+        top: 100px;
+        left: 20px;
+        background: rgba(0,0,0,0.5);
+        padding: 20px;
+        border-radius: 10px;
+        width: 250px;
+    }
+    .upgrade {
+        margin-bottom: 10px;
+    }
+    button {
+        cursor: pointer;
+        padding: 5px 10px;
+        font-size: 16px;
     }
 </style>
 </head>
 <body>
+
 <div id="counter">Clicks: 0</div>
+
+<div id="upgrades">
+    <h3>Upgrades</h3>
+    <div class="upgrade">
+        <button id="clickUpgradeBtn">Increase Click (+1)</button>
+        <span id="clickUpgradeCost">Cost: 10</span>
+    </div>
+    <div class="upgrade">
+        <button id="autoClickerBtn">Auto Clicker (+1/sec)</button>
+        <span id="autoClickerCost">Cost: 50</span>
+    </div>
+</div>
 
 <script>
 let clicks = parseInt(localStorage.getItem('clicks')) || 0;
-document.getElementById('counter').textContent = 'Clicks: ' + clicks;
-    
+let clickValue = parseInt(localStorage.getItem('clickValue')) || 1;
+let autoClickers = parseInt(localStorage.getItem('autoClickers')) || 0;
+
+let clickUpgradeCost = 10;
+let autoClickerCost = 50;
+
+const counterEl = document.getElementById('counter');
+const clickUpgradeBtn = document.getElementById('clickUpgradeBtn');
+const autoClickerBtn = document.getElementById('autoClickerBtn');
+const clickUpgradeCostEl = document.getElementById('clickUpgradeCost');
+const autoClickerCostEl = document.getElementById('autoClickerCost');
+
+function updateUI() {
+    counterEl.textContent = 'Clicks: ' + clicks;
+    clickUpgradeCostEl.textContent = 'Cost: ' + clickUpgradeCost;
+    autoClickerCostEl.textContent = 'Cost: ' + autoClickerCost;
+}
+
 document.body.addEventListener('click', () => {
-    clicks++;
-    document.getElementById('counter').textContent = 'Clicks: ' + clicks;
-    localStorage.setItem('clicks', clicks);
+    clicks += clickValue;
+    saveGame();
+    updateUI();
 });
+
+clickUpgradeBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (clicks >= clickUpgradeCost) {
+        clicks -= clickUpgradeCost;
+        clickValue += 1;
+        clickUpgradeCost = Math.floor(clickUpgradeCost * 1.5);
+        saveGame();
+        updateUI();
+    }
+});
+
+autoClickerBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (clicks >= autoClickerCost) {
+        clicks -= autoClickerCost;
+        autoClickers += 1;
+        autoClickerCost = Math.floor(autoClickerCost * 1.7);
+        saveGame();
+        updateUI();
+    }
+});
+
+setInterval(() => {
+    clicks += autoClickers;
+    saveGame();
+    updateUI();
+}, 1000);
+
+function saveGame() {
+    localStorage.setItem('clicks', clicks);
+    localStorage.setItem('clickValue', clickValue);
+    localStorage.setItem('autoClickers', autoClickers);
+}
+updateUI();
 </script>
+
 </body>
 </html>
