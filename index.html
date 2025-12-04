@@ -5,61 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Terminator Clicker</title>
 <style>
-    html, body {
-        margin: 0;
-        padding: 0;
-        height: 100%;
-        cursor: pointer;
-        user-select: none;
-        overflow: hidden;
-        font-family: Arial, sans-serif;
-    }
-    body {
-        background: url('https://i.ibb.co/ymTLMGvq/image.png') no-repeat center center fixed;
-        background-size: 100% 100%;
-        color: white;
-    }
-    #counter {
-        position: fixed;
-        top: 20px;
-        left: 20px;
-        font-size: 36px;
-        text-shadow: 1px 1px 5px black;
-    }
-    #upgrades {
-        position: fixed;
-        top: 100px;
-        left: 20px;
-        background: rgba(0,0,0,0.5);
-        padding: 20px;
-        border-radius: 10px;
-        width: 300px;
-    }
-    .upgrade {
-        margin-bottom: 10px;
-    }
-    button {
-        cursor: pointer;
-        padding: 5px 10px;
-        font-size: 16px;
-    }
-    .click-image {
-        position: absolute;
-        width: 50px;
-        height: 50px;
-        pointer-events: none;
-        animation: floatUp 1s forwards;
-    }
-    @keyframes floatUp {
-        0% {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-        }
-        100% {
-            opacity: 0;
-            transform: translateY(-100px) scale(1.2);
-        }
-    }
+html, body {margin:0;padding:0;height:100%;cursor:pointer;user-select:none;overflow:hidden;font-family:Arial, sans-serif}
+body {background:url('https://i.ibb.co/ymTLMGvq/image.png') no-repeat center center fixed;background-size:100% 100%;color:white}
+#counter {position:fixed;top:20px;left:20px;font-size:36px;text-shadow:1px 1px 5px black}
+#upgrades {position:fixed;top:100px;left:20px;background:rgba(0,0,0,0.5);padding:20px;border-radius:10px;width:300px}
+.upgrade {margin-bottom:10px}
+button {cursor:pointer;padding:5px 10px;font-size:16px}
+.click-image {position:absolute;width:50px;height:50px;pointer-events:none;animation:floatUp 1s forwards}
+@keyframes floatUp {0%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-100px) scale(1.2)}}
+#skins {position:fixed;top:300px;left:20px;background:rgba(0,0,0,0.5);padding:20px;border-radius:10px;width:300px}
 </style>
 </head>
 <body>
@@ -67,114 +21,108 @@
 <div id="counter">Clicks: 0</div>
 
 <div id="upgrades">
-    <h3>Upgrades</h3>
-    <div class="upgrade">
-        <button id="clickUpgradeBtn">Increase Click (+1)</button>
-        <span id="clickUpgradeCost">Cost: 10</span>
-        <div>Bought: <span id="clickUpgradesBought">0</span></div>
-    </div>
-    <div class="upgrade">
-        <button id="autoClickerBtn">Auto Clicker (+1/sec)</button>
-        <span id="autoClickerCost">Cost: 50</span>
-        <div>Bought: <span id="autoClickersBought">0</span></div>
-    </div>
+<h3>Upgrades</h3>
+<div class="upgrade">
+<button id="clickUpgradeBtn">Increase Click (+1)</button>
+<span id="clickUpgradeCost">Cost: 10</span>
+<div>Bought: <span id="clickUpgradesBought">0</span></div>
+</div>
+<div class="upgrade">
+<button id="autoClickerBtn">Auto Clicker (+1/sec)</button>
+<span id="autoClickerCost">Cost: 50</span>
+<div>Bought: <span id="autoClickersBought">0</span></div>
+</div>
+</div>
+
+<div id="skins">
+<h3>Skins</h3>
+<button id="rollSkinBtn">Roll Skin (10 clicks)</button>
+<div>Current Skin: <span id="currentSkin">Default</span></div>
 </div>
 
 <script>
-let clicks = parseInt(localStorage.getItem('clicks')) || 0;
-let clickValue = parseInt(localStorage.getItem('clickValue')) || 1;
-let autoClickers = parseInt(localStorage.getItem('autoClickers')) || 0;
-let clickUpgradeCost = parseInt(localStorage.getItem('clickUpgradeCost')) || 10;
-let autoClickerCost = parseInt(localStorage.getItem('autoClickerCost')) || 50;
-let clickUpgradesBought = parseInt(localStorage.getItem('clickUpgradesBought')) || 0;
-let autoClickersBought = parseInt(localStorage.getItem('autoClickersBought')) || 0;
-
-const counterEl = document.getElementById('counter');
-const clickUpgradeBtn = document.getElementById('clickUpgradeBtn');
-const autoClickerBtn = document.getElementById('autoClickerBtn');
-const clickUpgradeCostEl = document.getElementById('clickUpgradeCost');
-const autoClickerCostEl = document.getElementById('autoClickerCost');
-const clickUpgradesBoughtEl = document.getElementById('clickUpgradesBought');
-const autoClickersBoughtEl = document.getElementById('autoClickersBought');
-
-const clickImages = [
-    'https://i.ibb.co/wh5Z2pDB/image.png',
-    'https://i.ibb.co/65yZz7c/image.png',
-    'https://i.ibb.co/ymTLMGvq/image.png'
-];
-const easterEggImage = 'https://i.ibb.co/MkmVNxFN/image.png';
-
-function updateUI() {
-    counterEl.textContent = 'Clicks: ' + clicks;
-    clickUpgradeCostEl.textContent = 'Cost: ' + clickUpgradeCost;
-    autoClickerCostEl.textContent = 'Cost: ' + autoClickerCost;
-    clickUpgradesBoughtEl.textContent = clickUpgradesBought;
-    autoClickersBoughtEl.textContent = autoClickersBought;
+let clicks = parseInt(localStorage.getItem('clicks'))||0
+let clickValue = parseInt(localStorage.getItem('clickValue'))||1
+let autoClickers = parseInt(localStorage.getItem('autoClickers'))||0
+let clickUpgradeCost = parseInt(localStorage.getItem('clickUpgradeCost'))||10
+let autoClickerCost = parseInt(localStorage.getItem('autoClickerCost'))||50
+let clickUpgradesBought = parseInt(localStorage.getItem('clickUpgradesBought'))||0
+let autoClickersBought = parseInt(localStorage.getItem('autoClickersBought'))||0
+let currentSkin = localStorage.getItem('currentSkin')||'Default'
+const counterEl=document.getElementById('counter')
+const clickUpgradeBtn=document.getElementById('clickUpgradeBtn')
+const autoClickerBtn=document.getElementById('autoClickerBtn')
+const clickUpgradeCostEl=document.getElementById('clickUpgradeCost')
+const autoClickerCostEl=document.getElementById('autoClickerCost')
+const clickUpgradesBoughtEl=document.getElementById('clickUpgradesBought')
+const autoClickersBoughtEl=document.getElementById('autoClickersBought')
+const currentSkinEl=document.getElementById('currentSkin')
+const rollSkinBtn=document.getElementById('rollSkinBtn')
+const clickImages=['https://i.ibb.co/wh5Z2pDB/image.png','https://i.ibb.co/65yZz7c/image.png','https://i.ibb.co/ymTLMGvq/image.png']
+const easterEggImage='https://i.ibb.co/MkmVNxFN/image.png'
+const skins=[
+ {name:'Cute Terminator (Default)',bg:'https://i.ibb.co/ymTLMGvq/image.png'},
+ {name:'Ultimate Freak',bg:'https://i.ibb.co/65yZz7c/image.png'},
+ {name:'Rå Freak Terminator',bg:'https://i.ibb.co/wh5Z2pDB/image.png'},
+ {name:'Sigma Grimm',bg:'https://i.ibb.co/MkmVNxFN/image.png'}
+]
+function updateUI(){
+ counterEl.textContent='Clicks: '+clicks
+ clickUpgradeCostEl.textContent='Cost: '+clickUpgradeCost
+ autoClickerCostEl.textContent='Cost: '+autoClickerCost
+ clickUpgradesBoughtEl.textContent=clickUpgradesBought
+ autoClickersBoughtEl.textContent=autoClickersBought
+ currentSkinEl.textContent=currentSkin
+ document.body.style.background='url('+skins.find(s=>s.name===currentSkin).bg+') no-repeat center center fixed'
+ document.body.style.backgroundSize='100% 100%'
 }
-
-function showClickImage(x, y) {
-    const img = document.createElement('img');
-    const rand = Math.random();
-    if(rand < 0.05){
-        img.src = easterEggImage;
-    } else {
-        img.src = clickImages[Math.floor(Math.random() * clickImages.length)];
-    }
-    img.className = 'click-image';
-    img.style.left = x - 25 + 'px';
-    img.style.top = y - 25 + 'px';
-    document.body.appendChild(img);
-    img.addEventListener('animationend', () => img.remove());
+function showClickImage(x,y){
+ const img=document.createElement('img')
+ const rand=Math.random()
+ if(rand<0.05){img.src=easterEggImage}else{img.src=clickImages[Math.floor(Math.random()*clickImages.length)]}
+ img.className='click-image'
+ img.style.left=x-25+'px'
+ img.style.top=y-25+'px'
+ document.body.appendChild(img)
+ img.addEventListener('animationend',()=>img.remove())
 }
-
-document.body.addEventListener('click', (e) => {
-    clicks += clickValue;
-    saveGame();
-    updateUI();
-    showClickImage(e.clientX, e.clientY);
-});
-
-clickUpgradeBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    if (clicks >= clickUpgradeCost) {
-        clicks -= clickUpgradeCost;
-        clickValue += 1;
-        clickUpgradeCost = Math.floor(clickUpgradeCost * 1.5);
-        clickUpgradesBought++;
-        saveGame();
-        updateUI();
-    }
-});
-
-autoClickerBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    if (clicks >= autoClickerCost) {
-        clicks -= autoClickerCost;
-        autoClickers += 1;
-        autoClickerCost = Math.floor(autoClickerCost * 1.7);
-        autoClickersBought++;
-        saveGame();
-        updateUI();
-    }
-});
-
-setInterval(() => {
-    clicks += autoClickers;
-    saveGame();
-    updateUI();
-}, 1000);
-
-function saveGame() {
-    localStorage.setItem('clicks', clicks);
-    localStorage.setItem('clickValue', clickValue);
-    localStorage.setItem('autoClickers', autoClickers);
-    localStorage.setItem('clickUpgradeCost', clickUpgradeCost);
-    localStorage.setItem('autoClickerCost', autoClickerCost);
-    localStorage.setItem('clickUpgradesBought', clickUpgradesBought);
-    localStorage.setItem('autoClickersBought', autoClickersBought);
+document.body.addEventListener('click',(e)=>{
+ clicks+=clickValue
+ saveGame()
+ updateUI()
+ showClickImage(e.clientX,e.clientY)
+})
+clickUpgradeBtn.addEventListener('click',(e)=>{
+ e.stopPropagation()
+ if(clicks>=clickUpgradeCost){clicks-=clickUpgradeCost;clickValue+=1;clickUpgradeCost=Math.floor(clickUpgradeCost*1.5);clickUpgradesBought++;saveGame();updateUI()}
+})
+autoClickerBtn.addEventListener('click',(e)=>{
+ e.stopPropagation()
+ if(clicks>=autoClickerCost){clicks-=autoClickerCost;autoClickers+=1;autoClickerCost=Math.floor(autoClickerCost*1.7);autoClickersBought++;saveGame();updateUI()}
+})
+setInterval(()=>{clicks+=autoClickers;saveGame();updateUI()},1000)
+rollSkinBtn.addEventListener('click',(e)=>{
+ e.stopPropagation()
+ if(clicks>=10){
+  clicks-=10
+  let availableSkins=skins.filter(s=>s.name!==currentSkin)
+  let chosen=availableSkins[Math.floor(Math.random()*availableSkins.length)]
+  currentSkin=chosen.name
+  saveGame()
+  updateUI()
+ }
+})
+function saveGame(){
+ localStorage.setItem('clicks',clicks)
+ localStorage.setItem('clickValue',clickValue)
+ localStorage.setItem('autoClickers',autoClickers)
+ localStorage.setItem('clickUpgradeCost',clickUpgradeCost)
+ localStorage.setItem('autoClickerCost',autoClickerCost)
+ localStorage.setItem('clickUpgradesBought',clickUpgradesBought)
+ localStorage.setItem('autoClickersBought',autoClickersBought)
+ localStorage.setItem('currentSkin',currentSkin)
 }
-
-updateUI();
+updateUI()
 </script>
 
 </body>
