@@ -43,8 +43,6 @@
         padding: 5px 10px;
         font-size: 16px;
     }
-
-    /* Floating image effect */
     .click-image {
         position: absolute;
         width: 50px;
@@ -82,13 +80,11 @@
 </div>
 
 <script>
-// Load persistent data
 let clicks = parseInt(localStorage.getItem('clicks')) || 0;
 let clickValue = parseInt(localStorage.getItem('clickValue')) || 1;
 let autoClickers = parseInt(localStorage.getItem('autoClickers')) || 0;
-
-let clickUpgradeCost = 10;
-let autoClickerCost = 50;
+let clickUpgradeCost = parseInt(localStorage.getItem('clickUpgradeCost')) || 10;
+let autoClickerCost = parseInt(localStorage.getItem('autoClickerCost')) || 50;
 
 const counterEl = document.getElementById('counter');
 const clickUpgradeBtn = document.getElementById('clickUpgradeBtn');
@@ -102,22 +98,19 @@ function updateUI() {
     autoClickerCostEl.textContent = 'Cost: ' + autoClickerCost;
 }
 
-// Function to show floating image at click position
 function showClickImage(x, y) {
     const img = document.createElement('img');
-    img.src = 'https://i.ibb.co/ymTLMGvq/image.png'; // small image of Ozzie
+    img.src = 'https://i.ibb.co/ymTLMGvq/image.png';
     img.className = 'click-image';
-    img.style.left = x - 25 + 'px'; // center image at cursor
+    img.style.left = x - 25 + 'px';
     img.style.top = y - 25 + 'px';
     document.body.appendChild(img);
 
-    // Remove after animation completes
     img.addEventListener('animationend', () => {
         img.remove();
     });
 }
 
-// Manual click
 document.body.addEventListener('click', (e) => {
     clicks += clickValue;
     saveGame();
@@ -125,9 +118,8 @@ document.body.addEventListener('click', (e) => {
     showClickImage(e.clientX, e.clientY);
 });
 
-// Upgrade buttons
 clickUpgradeBtn.addEventListener('click', (e) => {
-    e.stopPropagation(); // Prevent counting as manual click
+    e.stopPropagation();
     if (clicks >= clickUpgradeCost) {
         clicks -= clickUpgradeCost;
         clickValue += 1;
@@ -158,6 +150,8 @@ function saveGame() {
     localStorage.setItem('clicks', clicks);
     localStorage.setItem('clickValue', clickValue);
     localStorage.setItem('autoClickers', autoClickers);
+    localStorage.setItem('clickUpgradeCost', clickUpgradeCost);
+    localStorage.setItem('autoClickerCost', autoClickerCost);
 }
 
 updateUI();
