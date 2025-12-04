@@ -43,6 +43,26 @@
         padding: 5px 10px;
         font-size: 16px;
     }
+
+    /* Floating image effect */
+    .click-image {
+        position: absolute;
+        width: 50px;
+        height: 50px;
+        pointer-events: none;
+        animation: floatUp 1s forwards;
+    }
+
+    @keyframes floatUp {
+        0% {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+        100% {
+            opacity: 0;
+            transform: translateY(-100px) scale(1.2);
+        }
+    }
 </style>
 </head>
 <body>
@@ -62,6 +82,7 @@
 </div>
 
 <script>
+// Load persistent data
 let clicks = parseInt(localStorage.getItem('clicks')) || 0;
 let clickValue = parseInt(localStorage.getItem('clickValue')) || 1;
 let autoClickers = parseInt(localStorage.getItem('autoClickers')) || 0;
@@ -81,14 +102,32 @@ function updateUI() {
     autoClickerCostEl.textContent = 'Cost: ' + autoClickerCost;
 }
 
-document.body.addEventListener('click', () => {
+// Function to show floating image at click position
+function showClickImage(x, y) {
+    const img = document.createElement('img');
+    img.src = 'https://i.ibb.co/ymTLMGvq/image.png'; // small image of Ozzie
+    img.className = 'click-image';
+    img.style.left = x - 25 + 'px'; // center image at cursor
+    img.style.top = y - 25 + 'px';
+    document.body.appendChild(img);
+
+    // Remove after animation completes
+    img.addEventListener('animationend', () => {
+        img.remove();
+    });
+}
+
+// Manual click
+document.body.addEventListener('click', (e) => {
     clicks += clickValue;
     saveGame();
     updateUI();
+    showClickImage(e.clientX, e.clientY);
 });
 
+// Upgrade buttons
 clickUpgradeBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
+    e.stopPropagation(); // Prevent counting as manual click
     if (clicks >= clickUpgradeCost) {
         clicks -= clickUpgradeCost;
         clickValue += 1;
@@ -120,6 +159,7 @@ function saveGame() {
     localStorage.setItem('clickValue', clickValue);
     localStorage.setItem('autoClickers', autoClickers);
 }
+
 updateUI();
 </script>
 
