@@ -5,23 +5,27 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Terminator Clicker</title>
 <style>
-html, body {margin:0;padding:0;height:100%;cursor:pointer;user-select:none;overflow:hidden;font-family:Arial, sans-serif}
-body {background:url('https://i.ibb.co/ymTLMGvq/image.png') no-repeat center center fixed;background-size:100% 100%;color:white}
-#counter {position:fixed;top:20px;left:20px;font-size:36px;text-shadow:1px 1px 5px black}
-#upgrades {position:fixed;top:100px;left:20px;background:rgba(0,0,0,0.5);padding:20px;border-radius:10px;width:300px}
-.upgrade {margin-bottom:10px}
-button {cursor:pointer;padding:5px 10px;font-size:16px}
-.click-image {position:absolute;width:50px;height:50px;pointer-events:none;animation:floatUp 1s forwards}
-@keyframes floatUp {0%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-100px) scale(1.2)}}
-#skins {position:fixed;top:500px;left:20px;background:rgba(0,0,0,0.5);padding:20px;border-radius:10px;width:300px}
-#achievements {position:fixed;top:800px;left:20px;background:rgba(0,0,0,0.5);padding:20px;border-radius:10px;width:300px}
+html, body {margin:0; padding:0; height:100%; font-family: 'Arial', sans-serif; overflow:hidden; cursor:pointer; background:#000}
+body {background:url('https://i.ibb.co/ymTLMGvq/image.png') no-repeat center center fixed; background-size:cover; color:white;}
+#counter {position:fixed; top:20px; left:20px; font-size:36px; text-shadow:2px 2px 5px black;}
+.panel {position:fixed; left:20px; background:rgba(0,0,0,0.6); padding:20px; border-radius:12px; width:300px; box-shadow:0 0 10px rgba(0,0,0,0.5);}
+#upgrades {top:100px;}
+#skins {top:500px;}
+#achievements {top:800px;}
+button {cursor:pointer; padding:8px 14px; font-size:16px; border:none; border-radius:6px; background:rgba(255,255,255,0.1); color:white; transition:0.2s;}
+button:hover {background:rgba(255,255,255,0.3);}
+.click-image {position:absolute; width:50px; height:50px; pointer-events:none; animation:floatUp 1s forwards;}
+@keyframes floatUp {0%{opacity:1; transform:translateY(0) scale(1);} 100%{opacity:0; transform:translateY(-100px) scale(1.3);}}
+#muteBtn {position:fixed; top:20px; right:20px; padding:8px 14px; border-radius:8px; border:none; background:rgba(255,255,255,0.2); color:white; font-weight:bold;}
+#muteBtn:hover {background:rgba(255,255,255,0.4);}
+ul {margin:0; padding-left:20px;}
 </style>
 </head>
 <body>
 
 <div id="counter">Clicks: 0</div>
 
-<div id="upgrades">
+<div id="upgrades" class="panel">
 <h3>Upgrades</h3>
 <div class="upgrade">
 <button id="clickUpgradeBtn">Increase Click (+1)</button>
@@ -49,56 +53,60 @@ button {cursor:pointer;padding:5px 10px;font-size:16px}
 </div>
 </div>
 
-<div id="skins">
+<div id="skins" class="panel">
 <h3>Skins</h3>
 <button id="rollSkinBtn">Roll Skin (10 clicks)</button>
 <div>Current Skin: <span id="currentSkin">Default</span></div>
 </div>
 
-<div id="achievements">
+<div id="achievements" class="panel">
 <h3>Achievements</h3>
 <ul id="achList"></ul>
 </div>
 
-
-  <button id="muteBtn">Mute Sounds</button>
+<button id="muteBtn">Mute Sounds</button>
 
 <script>
-let clicks = parseInt(localStorage.getItem('clicks'))||0
-let clickValue = parseInt(localStorage.getItem('clickValue'))||1
-let autoClickers = parseInt(localStorage.getItem('autoClickers'))||0
-let clickUpgradeCost = parseInt(localStorage.getItem('clickUpgradeCost'))||10
-let autoClickerCost = parseInt(localStorage.getItem('autoClickerCost'))||50
-let clickUpgradesBought = parseInt(localStorage.getItem('clickUpgradesBought'))||0
-let autoClickersBought = parseInt(localStorage.getItem('autoClickersBought'))||0
-let clickMultipliersBought = parseInt(localStorage.getItem('clickMultipliersBought'))||0
-let autoClickSpeedBought = parseInt(localStorage.getItem('autoClickSpeedBought'))||0
-let prestigePoints = parseInt(localStorage.getItem('prestigePoints'))||0
-let currentSkin = localStorage.getItem('currentSkin')||'Default'
-let lastDaily = localStorage.getItem('lastDaily')||0
-let combo = 0
+// ---- Game Variables ----
+let clicks = parseInt(localStorage.getItem('clicks')) || 0;
+let clickValue = parseInt(localStorage.getItem('clickValue')) || 1;
+let autoClickers = parseInt(localStorage.getItem('autoClickers')) || 0;
+let clickUpgradeCost = parseInt(localStorage.getItem('clickUpgradeCost')) || 10;
+let autoClickerCost = parseInt(localStorage.getItem('autoClickerCost')) || 50;
+let clickUpgradesBought = parseInt(localStorage.getItem('clickUpgradesBought')) || 0;
+let autoClickersBought = parseInt(localStorage.getItem('autoClickersBought')) || 0;
+let clickMultipliersBought = parseInt(localStorage.getItem('clickMultipliersBought')) || 0;
+let autoClickSpeedBought = parseInt(localStorage.getItem('autoClickSpeedBought')) || 0;
+let prestigePoints = parseInt(localStorage.getItem('prestigePoints')) || 0;
+let currentSkin = localStorage.getItem('currentSkin') || 'Default';
+let lastDaily = localStorage.getItem('lastDaily') || 0;
+let combo = 0;
+let isMuted = false;
 
-const counterEl=document.getElementById('counter')
-const clickUpgradeBtn=document.getElementById('clickUpgradeBtn')
-const autoClickerBtn=document.getElementById('autoClickerBtn')
-const clickUpgradeCostEl=document.getElementById('clickUpgradeCost')
-const autoClickerCostEl=document.getElementById('autoClickerCost')
-const clickUpgradesBoughtEl=document.getElementById('clickUpgradesBought')
-const autoClickersBoughtEl=document.getElementById('autoClickersBought')
-const currentSkinEl=document.getElementById('currentSkin')
-const rollSkinBtn=document.getElementById('rollSkinBtn')
-const clickMultiplierBtn=document.getElementById('clickMultiplierBtn')
-const clickMultiplierCostEl=document.getElementById('clickMultiplierCost')
-const clickMultipliersBoughtEl=document.getElementById('clickMultipliersBought')
-const autoClickSpeedBtn=document.getElementById('autoClickSpeedBtn')
-const autoClickSpeedCostEl=document.getElementById('autoClickSpeedCost')
-const autoClickSpeedBoughtEl=document.getElementById('autoClickSpeedBought')
-const prestigeBtn=document.getElementById('prestigeBtn')
-const prestigeBonusEl=document.getElementById('prestigeBonus')
-const achList=document.getElementById('achList')
+// ---- DOM Elements ----
+const counterEl=document.getElementById('counter');
+const clickUpgradeBtn=document.getElementById('clickUpgradeBtn');
+const autoClickerBtn=document.getElementById('autoClickerBtn');
+const clickUpgradeCostEl=document.getElementById('clickUpgradeCost');
+const autoClickerCostEl=document.getElementById('autoClickerCost');
+const clickUpgradesBoughtEl=document.getElementById('clickUpgradesBought');
+const autoClickersBoughtEl=document.getElementById('autoClickersBought');
+const currentSkinEl=document.getElementById('currentSkin');
+const rollSkinBtn=document.getElementById('rollSkinBtn');
+const clickMultiplierBtn=document.getElementById('clickMultiplierBtn');
+const clickMultiplierCostEl=document.getElementById('clickMultiplierCost');
+const clickMultipliersBoughtEl=document.getElementById('clickMultipliersBought');
+const autoClickSpeedBtn=document.getElementById('autoClickSpeedBtn');
+const autoClickSpeedCostEl=document.getElementById('autoClickSpeedCost');
+const autoClickSpeedBoughtEl=document.getElementById('autoClickSpeedBought');
+const prestigeBtn=document.getElementById('prestigeBtn');
+const prestigeBonusEl=document.getElementById('prestigeBonus');
+const achList=document.getElementById('achList');
+const muteBtnEl=document.getElementById('muteBtn');
 
-const clickImages=['https://i.ibb.co/wh5Z2pDB/image.png','https://i.ibb.co/65yZz7c/image.png','https://i.ibb.co/ymTLMGvq/image.png', 'https://i.ibb.co/YFZrMzHf/image.png', 'https://i.ibb.co/gCbkQ56/image.png', 'https://i.ibb.co/67zQts5j/image.png' ]
-const easterEggImage='https://i.ibb.co/MkmVNxFN/image.png'
+// ---- Images & Skins ----
+const clickImages=['https://i.ibb.co/wh5Z2pDB/image.png','https://i.ibb.co/65yZz7c/image.png','https://i.ibb.co/ymTLMGvq/image.png', 'https://i.ibb.co/YFZrMzHf/image.png', 'https://i.ibb.co/gCbkQ56/image.png', 'https://i.ibb.co/67zQts5j/image.png' ];
+const easterEggImage='https://i.ibb.co/MkmVNxFN/image.png';
 const skins=[
  {name:'Cute Terminator (Default)',bg:'https://i.ibb.co/ymTLMGvq/image.png'},
  {name:'Ultimate Freak',bg:'https://i.ibb.co/65yZz7c/image.png'},
@@ -108,198 +116,113 @@ const skins=[
  {name:'Rå Freak Jim',bg:'https://i.ibb.co/gCbkQ56/image.png'},
  {name:'Cutie Jim?',bg:'https://i.ibb.co/67zQts5j/image.png'},
  {name:'Snap Grim',bg:'https://i.ibb.co/YFZrMzHf/image.png'}
-]
+];
 
-// SOUND EFFECTS
-const clickSound = new Audio('https://www.myinstants.com/media/sounds/dry-fart.mp3')
-const bonusSound = new Audio('https://www.myinstants.com/media/sounds/coin.mp3')
+// ---- Sound ----
+const clickSound = new Audio('https://www.myinstants.com/media/sounds/dry-fart.mp3');
+const bonusSound = new Audio('https://www.myinstants.com/media/sounds/coin.mp3');
+function playSound(sound){ if(!isMuted){ sound.currentTime=0; sound.play(); } }
+muteBtnEl.addEventListener('click', ()=>{
+  isMuted = !isMuted;
+  clickSound.muted = bonusSound.muted = isMuted;
+  muteBtnEl.textContent = isMuted ? 'Unmute Sounds':'Mute Sounds';
+});
 
+// ---- UI Update ----
 function updateUI(){
- counterEl.textContent='Clicks: '+clicks
- clickUpgradeCostEl.textContent='Cost: '+clickUpgradeCost
- autoClickerCostEl.textContent='Cost: '+autoClickerCost
- clickUpgradesBoughtEl.textContent=clickUpgradesBought
- autoClickersBoughtEl.textContent=autoClickersBought
- currentSkinEl.textContent=currentSkin
- clickMultiplierCostEl.textContent='Cost: '+Math.floor(200*Math.pow(2,clickMultipliersBought))
- clickMultipliersBoughtEl.textContent=clickMultipliersBought
- autoClickSpeedCostEl.textContent='Cost: '+Math.floor(500*Math.pow(2,autoClickSpeedBought))
- autoClickSpeedBoughtEl.textContent=autoClickSpeedBought
-prestigeBonusEl.textContent=`+${prestigePoints*10}% click boost`
- document.body.style.background='url('+skins.find(s=>s.name===currentSkin).bg+') no-repeat center center fixed'
- document.body.style.backgroundSize='100% 100%'
- checkAchievements()
+ counterEl.textContent = 'Clicks: ' + clicks;
+ clickUpgradeCostEl.textContent = 'Cost: ' + clickUpgradeCost;
+ autoClickerCostEl.textContent = 'Cost: ' + autoClickerCost;
+ clickUpgradesBoughtEl.textContent = clickUpgradesBought;
+ autoClickersBoughtEl.textContent = autoClickersBought;
+ currentSkinEl.textContent = currentSkin;
+ clickMultiplierCostEl.textContent = 'Cost: ' + Math.floor(200*Math.pow(2,clickMultipliersBought));
+ clickMultipliersBoughtEl.textContent = clickMultipliersBought;
+ autoClickSpeedCostEl.textContent = 'Cost: ' + Math.floor(500*Math.pow(2,autoClickSpeedBought));
+ autoClickSpeedBoughtEl.textContent = autoClickSpeedBought;
+ prestigeBonusEl.textContent = `+${prestigePoints*10}% click boost`;
+ document.body.style.background = 'url(' + skins.find(s=>s.name===currentSkin).bg + ') no-repeat center center fixed';
+ document.body.style.backgroundSize = 'cover';
+ checkAchievements();
 }
 
-function playSound(sound) {
-  if (!isMuted) {
-    sound.currentTime = 0 // rewind to start
-    sound.play()
-  }
-}
-
-
-let isMuted = false
-const muteBtn = document.getElementById('muteBtn')
-
-muteBtn.addEventListener('click', () => {
-  isMuted = !isMuted
-  clickSound.muted = isMuted
-  bonusSound.muted = isMuted
-  muteBtn.textContent = isMuted ? 'Unmute Sounds' : 'Mute Sounds'
-})
-
-
+// ---- Click Animation ----
 function showClickImage(x,y){
- const img=document.createElement('img')
- const rand=Math.random()
- if(rand<0.05){img.src=easterEggImage}else{img.src=clickImages[Math.floor(Math.random()*clickImages.length)]}
- img.className='click-image'
- img.style.left=x-25+'px'
- img.style.top=y-25+'px'
- document.body.appendChild(img)
- img.addEventListener('animationend',()=>img.remove())
+ const img=document.createElement('img');
+ img.src = Math.random() < 0.05 ? easterEggImage : clickImages[Math.floor(Math.random()*clickImages.length)];
+ img.className='click-image';
+ img.style.left=x-25+'px';
+ img.style.top=y-25+'px';
+ document.body.appendChild(img);
+ img.addEventListener('animationend',()=>img.remove());
 }
 
+// ---- Gain Clicks ----
 function gainClicks(amount){
- // Critical hit 10% chance
- if(Math.random()<0.1){amount*=2; playSound(bonusSound)}
- clicks+=amount
- combo++
- saveGame()
- updateUI()
+ if(Math.random()<0.1){ amount*=2; playSound(bonusSound);}
+ clicks += amount;
+ combo++;
+ saveGame();
+ updateUI();
 }
 
+// ---- Click Handlers ----
 document.body.addEventListener('click',(e)=>{
- gainClicks(clickValue*(1+prestigePoints*0.1))
- showClickImage(e.clientX,e.clientY)
- playSound(clickSound)
-})
+ gainClicks(clickValue*(1+prestigePoints*0.1));
+ showClickImage(e.clientX,e.clientY);
+ playSound(clickSound);
+});
 
-clickUpgradeBtn.addEventListener('click',(e)=>{
- e.stopPropagation()
- if(clicks>=clickUpgradeCost){
-  clicks-=clickUpgradeCost
-  clickValue+=1
-  clickUpgradeCost=Math.floor(clickUpgradeCost*1.5)
-  clickUpgradesBought++
-  saveGame()
-  updateUI()
- }
-})
+clickUpgradeBtn.addEventListener('click',(e)=>{ e.stopPropagation(); if(clicks>=clickUpgradeCost){ clicks-=clickUpgradeCost; clickValue++; clickUpgradeCost=Math.floor(clickUpgradeCost*1.5); clickUpgradesBought++; saveGame(); updateUI(); }});
+autoClickerBtn.addEventListener('click',(e)=>{ e.stopPropagation(); if(clicks>=autoClickerCost){ clicks-=autoClickerCost; autoClickers++; autoClickerCost=Math.floor(autoClickerCost*1.7); autoClickersBought++; saveGame(); updateUI(); }});
+clickMultiplierBtn.addEventListener('click',(e)=>{ e.stopPropagation(); let cost=Math.floor(200*Math.pow(2,clickMultipliersBought)); if(clicks>=cost){ clicks-=cost; clickValue*=2; clickMultipliersBought++; saveGame(); updateUI(); }});
+autoClickSpeedBtn.addEventListener('click',(e)=>{ e.stopPropagation(); let cost=Math.floor(500*Math.pow(2,autoClickSpeedBought)); if(clicks>=cost){ clicks-=cost; autoClickSpeedBought++; saveGame(); updateUI(); }});
+prestigeBtn.addEventListener('click',(e)=>{ e.stopPropagation(); if(confirm('Reset game for +10% click per prestige?')){ clicks=0; clickValue=1; autoClickers=0; clickUpgradeCost=10; autoClickerCost=50; clickUpgradesBought=0; autoClickersBought=0; clickMultipliersBought=0; autoClickSpeedBought=0; prestigePoints++; saveGame(); updateUI(); }});
 
-autoClickerBtn.addEventListener('click',(e)=>{
- e.stopPropagation()
- if(clicks>=autoClickerCost){
-  clicks-=autoClickerCost
-  autoClickers+=1
-  autoClickerCost=Math.floor(autoClickerCost*1.7)
-  autoClickersBought++
-  saveGame()
-  updateUI()
- }
-})
-
-clickMultiplierBtn.addEventListener('click',(e)=>{
- e.stopPropagation()
- let cost = Math.floor(200*Math.pow(2,clickMultipliersBought))
- if(clicks>=cost){
-  clicks-=cost
-  clickValue*=2
-  clickMultipliersBought++
-  saveGame()
-  updateUI()
- }
-})
-
-autoClickSpeedBtn.addEventListener('click',(e)=>{
- e.stopPropagation()
- let cost = Math.floor(500*Math.pow(2,autoClickSpeedBought))
- if(clicks>=cost){
-  clicks-=cost
-  autoClickSpeedBought++
-  saveGame()
-  updateUI()
- }
-})
-
-prestigeBtn.addEventListener('click',(e)=>{
- e.stopPropagation()
- if(confirm('Reset game for +10% click per prestige?')){
-  clicks=0
-  clickValue=1
-  autoClickers=0
-  clickUpgradeCost=10
-  autoClickerCost=50
-  clickUpgradesBought=0
-  autoClickersBought=0
-  clickMultipliersBought=0
-  autoClickSpeedBought=0
-  prestigePoints++
-  saveGame()
-  updateUI()
- }
-})
-
+// ---- Auto Clickers ----
 setInterval(()=>{
- let speed = Math.max(1, 1000/Math.pow(1.5,autoClickSpeedBought))
- clicks+=autoClickers
- saveGame()
- updateUI()
-},1000)
+ let speed = Math.max(1, 1000/Math.pow(1.5,autoClickSpeedBought));
+ clicks += autoClickers;
+ saveGame();
+ updateUI();
+},1000);
 
-rollSkinBtn.addEventListener('click',(e)=>{
- e.stopPropagation()
- if(clicks>=10){
-  clicks-=10
-  let availableSkins=skins.filter(s=>s.name!==currentSkin)
-  let chosen=availableSkins[Math.floor(Math.random()*availableSkins.length)]
-  currentSkin=chosen.name
-  saveGame()
-  updateUI()
- }
-})
+// ---- Skins ----
+rollSkinBtn.addEventListener('click',(e)=>{ e.stopPropagation(); if(clicks>=10){ clicks-=10; let availableSkins=skins.filter(s=>s.name!==currentSkin); currentSkin=availableSkins[Math.floor(Math.random()*availableSkins.length)].name; saveGame(); updateUI(); }});
 
+// ---- Save/Load ----
 function saveGame(){
- localStorage.setItem('clicks',clicks)
- localStorage.setItem('clickValue',clickValue)
- localStorage.setItem('autoClickers',autoClickers)
- localStorage.setItem('clickUpgradeCost',clickUpgradeCost)
- localStorage.setItem('autoClickerCost',autoClickerCost)
- localStorage.setItem('clickUpgradesBought',clickUpgradesBought)
- localStorage.setItem('autoClickersBought',autoClickersBought)
- localStorage.setItem('currentSkin',currentSkin)
- localStorage.setItem('clickMultipliersBought',clickMultipliersBought)
- localStorage.setItem('autoClickSpeedBought',autoClickSpeedBought)
- localStorage.setItem('prestigePoints',prestigePoints)
+ localStorage.setItem('clicks',clicks);
+ localStorage.setItem('clickValue',clickValue);
+ localStorage.setItem('autoClickers',autoClickers);
+ localStorage.setItem('clickUpgradeCost',clickUpgradeCost);
+ localStorage.setItem('autoClickerCost',autoClickerCost);
+ localStorage.setItem('clickUpgradesBought',clickUpgradesBought);
+ localStorage.setItem('autoClickersBought',autoClickersBought);
+ localStorage.setItem('currentSkin',currentSkin);
+ localStorage.setItem('clickMultipliersBought',clickMultipliersBought);
+ localStorage.setItem('autoClickSpeedBought',autoClickSpeedBought);
+ localStorage.setItem('prestigePoints',prestigePoints);
 }
 
-// DAILY BONUS
+// ---- Daily Bonus ----
 function dailyBonus(){
- let today = new Date().toDateString()
- if(lastDaily !== today){
-  clicks += 50
-  alert('Daily Bonus: +50 clicks!')
-  lastDaily = today
-  localStorage.setItem('lastDaily', today)
-  saveGame()
-  updateUI()
- }
+ let today = new Date().toDateString();
+ if(lastDaily !== today){ clicks += 50; alert('Daily Bonus: +50 clicks!'); lastDaily=today; localStorage.setItem('lastDaily',today); saveGame(); updateUI();}
 }
 
-// ACHIEVEMENTS
+// ---- Achievements ----
 function checkAchievements(){
- let achievements = []
- if(clicks>=100) achievements.push('100 clicks!')
- if(autoClickers>=10) achievements.push('10 autoClickers!')
- if(clickUpgradesBought>=5) achievements.push('5 click upgrades!')
- achList.innerHTML = achievements.map(a=>`<li>${a}</li>`).join('')
+ let achievements=[];
+ if(clicks>=100) achievements.push('100 clicks!');
+ if(autoClickers>=10) achievements.push('10 autoClickers!');
+ if(clickUpgradesBought>=5) achievements.push('5 click upgrades!');
+ achList.innerHTML = achievements.map(a=>`<li>${a}</li>`).join('');
 }
 
-// INIT
-updateUI()
-dailyBonus()
+// ---- Init ----
+updateUI();
+dailyBonus();
 </script>
-
 </body>
 </html>
